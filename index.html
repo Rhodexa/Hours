@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis horas desde el último pago</title>
+    <style>
+        *
+        body{
+            margin: 0;
+            height: 100vh;
+            background-color: rgb(78, 36, 117);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white;
+            /* Lets some nice and modern fancy fonts! */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 2em;
+        }
+        .progress-bar-container {
+            position: relative;
+            width: 90%;
+            max-width: 800px;
+            height: 30px;
+            display: flex;
+            flex-direction: row;
+            justify-content: start;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
+            gap: 5px;
+            padding: 6px;
+            background: linear-gradient(to bottom,
+                #f3d28b54 0%,
+                #f75da571 30%,
+                #c7993617 40%,
+                #3adb902d 100%);
+        }
+        .progress-bar {
+            height: 30px;
+            display: flex;
+            flex-direction: row;
+            justify-content: start;
+            align-items: center;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            gap: 5px;
+            /* Add diagonal stripes */
+            background: repeating-linear-gradient(
+                45deg,
+                rgba(255,255,255,0) 0px,
+                rgba(255,255,255,0) 12px,
+                rgba(0,0,0,0.2) 12px,
+                rgba(0,0,0,0.2) 24px
+            );
+            background-size: 68px 140px;
+            animation: stripes-move 2s linear infinite;
+            transition: 0.5s ease all;
+        }
+
+        @keyframes stripes-move {
+            0% { background-position: 0 0; }
+            100% { background-position: 68px 0px; }
+        }
+
+        .progress-bar-fragment {
+            width: 300px;
+            height: 30px;
+            background: linear-gradient(to bottom,
+                #f3d28bf0 0%,
+                #f7c65df0 30%,
+                #c7993640 40%,
+                #dba83ad0 100%);
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Sparkling Stars Styles */
+        .sparkle-stars {
+            position: relative;
+            width: 60px;    /* Set your desired width */
+            height: 40px;   /* Set your desired height */
+            pointer-events: none;
+            overflow: visible;
+            margin: 1rem auto; /* Center horizontally, adjust as needed */
+        }
+
+        .star {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .star1 { animation: sparkle 1.8s infinite alternate; width: 5px; height: 5px; top: 10px; left: 5px; }
+        .star2 { animation: sparkle 1.5s infinite alternate; width: 2px; height: 2px; top: 25px; left: 40px; }
+        .star3 { animation: sparkle 1.3s infinite alternate; width: 3px; height: 3px; top: 30px; left: 20px; }
+        .star4 { animation: sparkle 1.2s infinite alternate; width: 5px; height: 5px; top: 9px; left: 20px; }
+        .star5 { animation: sparkle 1.9s infinite alternate; width: 2px; height: 2px; top: 29px; left: 20px; }
+        .star6 { animation: sparkle 1.0s infinite alternate; width: 3px; height: 3px; top: 15px; left: 2px; }
+
+        @keyframes sparkle {
+            0% { transform: scale(0.1) translate(0, 2px); opacity: 0.2; }
+            100% { transform: scale(1.5); opacity: 1; }
+        }
+
+        .hours {
+            font-size: 1.5rem;
+            font-weight: bold;
+            user-select: none;
+            position: absolute;
+            left: 50%;
+            transform: translate(-50%, -2px);
+            color:white;
+            text-shadow: 0 0 3px rgba(0, 0, 0, 1);
+        }
+    </style>
+</head>
+<body>
+    <div style="display: flex; flex-direction: row;">
+        <div class="sparkle-stars">
+            <span class="star star1"></span>
+            <span class="star star2"></span>
+            <span class="star star3"></span>
+        </div>
+        <div style="display: flex; flex-direction: column;">
+            <h><b style="letter-spacing: 2px; font-size: 2.5rem; text-shadow: 0 5px 6px rgba(0, 0, 0, 0.3);">HORAS</b></h>
+            <div style="font-size: 1rem; opacity: 0.5; ">desde el último pago</div>        
+        </div>
+        <div class="sparkle-stars">
+            <span class="star star4"></span>
+            <span class="star star5"></span>
+            <span class="star star6"></span>
+        </div>
+    </div>
+
+
+    <div class="progress-bar-container" style="margin-top: 1rem;">
+        <div class="progress-bar" style="width: 0%">
+        </div>
+        <div class="hours">...buscando...</div>
+    </div>
+    <script>
+        const BAR_MAX = 10;
+
+        function renderBar(segments) {
+            const bar = document.querySelector('.progress-bar');
+            bar.innerHTML = '';
+            let total = segments.reduce((a, b) => a + b, 0);
+            
+            // Set bar width based on total/max
+            bar.style.width = `${(total / Math.max(BAR_MAX, total)) * 100}%`;
+            bar.innerHTML = '';
+            segments.forEach(seg => {
+                const frag = document.createElement('div');
+                frag.className = 'progress-bar-fragment';
+                frag.style.width = `${(seg / Math.max(BAR_MAX, total)) * 100}%`;
+                bar.appendChild(frag);
+            });
+            document.querySelector('.hours').textContent = `${total}h`;
+        }
+
+        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT0TRqQlvfamH3M-WFb3K98M92AESaPQMjZR-J5uf1q_axBX9EqB5ovThT7CGhegGz5IVEWh9fBvsSL/pub?output=csv';
+        const CORS_PROXY = 'https://corsproxy.io/?';
+        fetch(CORS_PROXY + encodeURIComponent(SHEET_URL))
+          .then(res => res.text())
+          .then(csv => {
+            const segments = csv.trim().split('\n').map(Number).filter(n => !isNaN(n));
+            renderBar(segments);
+          })
+          .catch(() => {
+            console.log('Error fetching or parsing CSV data.');
+            document.querySelector('.hours').textContent = "No pude cargar los datos :(";
+          });
+    </script>
+</body>
+</html>
